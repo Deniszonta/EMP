@@ -13,10 +13,12 @@ import com.example.myapplication.ui.LightSensorScreen
 import com.example.myapplication.ui.LoginScreen
 import com.example.myapplication.ui.RegistrationScreen
 import com.example.myapplication.ui.TaskListScreen
+import com.example.myapplication.utils.NotificationHelper
 import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        NotificationHelper.createNotificationChannel(this)
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
 

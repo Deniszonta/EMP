@@ -1,8 +1,14 @@
 package com.example.myapplication.repository
 
+import android.content.Context
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.example.myapplication.models.Task
+import com.example.myapplication.workers.TaskNotificationWorker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.concurrent.TimeUnit
 
 class TaskRepository {
     private val db = FirebaseFirestore.getInstance()
@@ -82,4 +88,16 @@ class TaskRepository {
                 onComplete(false)
             }
     }
+
+    fun scheduleHighPriorityNotification(task: Task, context: Context) {
+        if (task.priority == "High") {
+            val workRequest = OneTimeWorkRequestBuilder<TaskNotificationWorker>()
+                .setInitialDelay(1, TimeUnit.SECONDS) // Set appropriate delay
+                .setInputData(workDataOf("taskTitle" to task.title, "taskDescription" to task.description))
+                .build()
+
+            WorkManager.getInstance(context).enqueue(workRequest)
+        }
+    }
+
 }

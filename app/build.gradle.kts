@@ -65,6 +65,8 @@ dependencies {
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation (libs.play.services.auth)
+    implementation (libs.androidx.work.runtime.ktx)
+
 
 
 }

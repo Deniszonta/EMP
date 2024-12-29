@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.models.Task
 import com.example.myapplication.repository.TaskRepository
@@ -182,6 +183,9 @@ fun TaskListScreen(navController: NavController, onLogout: () -> Unit) {
                                     description = ""
                                     priority = "Medium"
                                     dueDate = null
+
+                                    // Schedule notification for high-priority tasks
+                                    repository.scheduleHighPriorityNotification(newTask, context)
                                 }
                             }
                         } else {
@@ -198,6 +202,9 @@ fun TaskListScreen(navController: NavController, onLogout: () -> Unit) {
                                     description = ""
                                     priority = "Medium"
                                     dueDate = null
+
+                                    // Schedule notification for high-priority tasks
+                                    repository.scheduleHighPriorityNotification(updatedTask, context)
                                 }
                             }
                         }
@@ -291,6 +298,12 @@ fun TaskItem(
         else -> MaterialTheme.colorScheme.onSurface
     }
 
+    val textStyle = if (task.isCompleted) {
+        MaterialTheme.typography.titleMedium.copy(textDecoration = TextDecoration.LineThrough)
+    } else {
+        MaterialTheme.typography.titleMedium
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -298,13 +311,37 @@ fun TaskItem(
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = task.title, style = MaterialTheme.typography.titleMedium)
+            Text(text = task.title, style = textStyle)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Priority: ${task.priority}", color = priorityColor)
+            Text(
+                text = "Priority: ${task.priority}",
+                color = priorityColor,
+                style = if (task.isCompleted) {
+                    MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.LineThrough)
+                } else {
+                    MaterialTheme.typography.bodyMedium
+                }
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Due Date: ${SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(task.dueDate)}", style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "Due Date: ${
+                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(task.dueDate)
+                }",
+                style = if (task.isCompleted) {
+                    MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.LineThrough)
+                } else {
+                    MaterialTheme.typography.bodyMedium
+                }
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = task.description, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = task.description,
+                style = if (task.isCompleted) {
+                    MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.LineThrough)
+                } else {
+                    MaterialTheme.typography.bodyMedium
+                }
+            )
             Spacer(modifier = Modifier.height(8.dp))
             Row {
                 Button(onClick = {
@@ -335,6 +372,7 @@ fun TaskItem(
         }
     }
 }
+
 
 @Composable
 fun PriorityDropdown(
